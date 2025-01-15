@@ -51,21 +51,44 @@
 
         // Gestion des messages reçus
         client.on('message', (channel, tags, message, self) => {
-            if (self) return; // Ignorer ses propres messages
-            
+            if (self) return; // Ignore les messages de toi-même
+
             const chatBox = document.getElementById('chat-box');
 
-            // Créer un nouvel élément pour le message
+            // Créer l'élément principal du message
             const msgElement = document.createElement('div');
-            msgElement.className = 'message';
+            msgElement.className = 'message'; // Classe pour styliser tout le message
 
-            // Ajouter le nom d'utilisateur et le message
-            msgElement.innerHTML = `<span class="username">${tags['display-name']}:</span> ${message}`;
+            // Ajouter le badge (s'il existe)
+            const badgeElement = document.createElement('span');
+            badgeElement.className = 'badge';
+            if (tags.badges) {
+                if (tags.badges.moderator) badgeElement.textContent = '🛡️'; // Exemple badge modérateur
+                else if (tags.badges.subscriber) badgeElement.textContent = '⭐'; // Exemple badge abonné
+            }
+
+            // Ajouter le nom d'utilisateur
+            const usernameElement = document.createElement('span');
+            usernameElement.className = 'username';
+            usernameElement.textContent = tags['display-name'];
+
+            // Ajouter le contenu du message
+            const messageElement = document.createElement('span');
+            messageElement.className = 'chat-message';
+            messageElement.textContent = `: ${message}`;
+
+            // Ajouter les éléments au message principal
+            msgElement.appendChild(badgeElement);
+            msgElement.appendChild(usernameElement);
+            msgElement.appendChild(messageElement);
+
+            // Ajouter le message à la boîte de chat
             chatBox.appendChild(msgElement);
 
-            // Faire défiler automatiquement vers le bas
+            // Scroll automatique vers le bas
             chatBox.scrollTop = chatBox.scrollHeight;
         });
+
     </script>
 </body>
 </html>
