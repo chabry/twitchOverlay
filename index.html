@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitch Chat Overlay</title>
+    <style>
+        body {
+            margin: 0;
+            background: transparent; /* Fond transparent pour OBS */
+        }
+        #chat-box {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 300px;
+            height: 400px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.7); /* Fond semi-transparent */
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+        }
+        .message {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .username {
+            font-weight: bold;
+            color: #1db954; /* Couleur verte pour les noms d'utilisateur */
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-box"></div>
+    <script src="tmi.min.js"></script>
+    <script>
+        // Configuration du client tmi.js
+        const client = new tmi.Client({
+            options: { debug: true },
+            connection: {
+                secure: true,
+                reconnect: true
+            },
+            channels: ['ch4bry'] // Remplace par ton nom de chaîne Twitch
+        });
+
+        // Connexion au chat
+        client.connect();
+
+        // Gestion des messages reçus
+        client.on('message', (channel, tags, message, self) => {
+            if (self) return; // Ignorer ses propres messages
+            
+            const chatBox = document.getElementById('chat-box');
+
+            // Créer un nouvel élément pour le message
+            const msgElement = document.createElement('div');
+            msgElement.className = 'message';
+
+            // Ajouter le nom d'utilisateur et le message
+            msgElement.innerHTML = `<span class="username">${tags['display-name']}:</span> ${message}`;
+            chatBox.appendChild(msgElement);
+
+            // Faire défiler automatiquement vers le bas
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    </script>
+</body>
+</html>
