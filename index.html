@@ -5,90 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twitch Chat Overlay</title>
     <style>
-        body {
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Noto+Sans+JP:wght@100..900&display=swap');
+        /* Body */
+        body{
             margin: 0;
-            background: transparent; /* Fond transparent pour OBS */
+            padding: 0;
         }
+        
+        /* Styles pour le chat */
         #chat-box {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 300px;
+            display: flex;
+            flex-direction: column; /* Les messages sont organisés en colonne */
+            overflow-y: hidden; /* Empêche les messages de sortir de la boîte */
+            background-color: rgba(86, 58, 43, 0.37);
+            border-radius: 12px;
             height: 400px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.7); /* Fond semi-transparent */
+            position: relative;
+            overflow-y: hidden; /* Scroll automatique */
+            width: 300px;
+            font-family: 'Fredoka', Arial;
             color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: Arial, sans-serif;
         }
-        .message {
-            margin-bottom: 5px;
-            font-size: 14px;
+
+        /* Animation de disparition */
+        @keyframes fadeOut {
+            from {
+            opacity: 1;
+            transform: translateY(0); /* Position normale */
+            }
+            to {
+            opacity: 0;
+            transform: translateY(-20px); /* Légèrement vers le haut */
+            }
         }
+
+        .message-box.fade-out {
+            opacity: 0; /* Disparition progressive */
+            transform: translateY(-20px); /* Déplacement léger vers le haut */
+        }
+
+        /* Boîte pour chaque message */
+        .message-box {
+            border-radius: 7px;
+            flex-direction: column; /* Deux boîtes empilées */
+            margin: 8px;
+            transition: transform 0.3s ease, opacity 0.3s ease; /* Animation des déplacements */
+        }
+
+        /* En-tête contenant badge et pseudo */
+        .header {
+            display: flex; /* Active Flexbox pour aligner les éléments horizontalement */
+            align-items: center; /* Centre verticalement les badges et le pseudo */
+            justify-content: flex-start;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 5px; /* Ajoute un espacement interne */
+            width: 165px;
+        }
+
+        .badge-container {
+            display: flex; /* Dispose les badges côte à côte */
+            align-items: center; /* Centre verticalement les badges */
+            margin: 0 4px; /* Espacement entre les badges et le pseudo */
+        }
+
+        .badge-container img {
+            width: 18px; /* Taille uniforme pour les badges */
+            height: 18px; /* Taille uniforme pour les badges */
+            object-fit: contain; /* Ajuste les proportions de l'image */
+            border-radius: 50%; /* Donne un effet arrondi si nécessaire */
+        }
+
+        .badge-container img:not(:last-child) {
+            margin-right: 5px; /* Ajoute un espacement uniquement entre les badges */
+        }
+
+        /* Style des noms d'utilisateur */
         .username {
             font-weight: bold;
-            color: #1db954; /* Couleur verte pour les noms d'utilisateur */
+            font-size: 22px;
+            line-height: 1; /* Garde le texte centré dans sa ligne */
+            letter-spacing: 1.5px;
+        }
+
+        /* Contenu du message */
+        .message-content {
+            font-weight:600;
+            font-size: 18px;
+            line-height: 1.4; /* Améliore la lisibilité */
+            letter-spacing: 0.5;
+            margin-left: 9px;
         }
     </style>
 </head>
 <body>
     <div id="chat-box"></div>
     <script src="tmi.min.js"></script>
-    <script>
-        // Configuration du client tmi.js
-        const client = new tmi.Client({
-            options: { debug: true },
-            connection: {
-                secure: true,
-                reconnect: true
-            },
-            channels: ['sonkek'] // Remplace par ton nom de chaîne Twitch
-        });
-
-        // Connexion au chat
-        client.connect();
-
-        // Gestion des messages reçus
-        client.on('message', (channel, tags, message, self) => {
-            if (self) return; // Ignore les messages de toi-même
-
-            const chatBox = document.getElementById('chat-box');
-
-            // Créer l'élément principal du message
-            const msgElement = document.createElement('div');
-            msgElement.className = 'message'; // Classe pour styliser tout le message
-
-            // Ajouter le badge (s'il existe)
-            const badgeElement = document.createElement('span');
-            badgeElement.className = 'badge';
-            if (tags.badges) {
-                if (tags.badges.moderator) badgeElement.textContent = '🛡️'; // Exemple badge modérateur
-                else if (tags.badges.subscriber) badgeElement.textContent = '⭐'; // Exemple badge abonné
-            }
-
-            // Ajouter le nom d'utilisateur
-            const usernameElement = document.createElement('span');
-            usernameElement.className = 'username';
-            usernameElement.textContent = tags['display-name'];
-
-            // Ajouter le contenu du message
-            const messageElement = document.createElement('span');
-            messageElement.className = 'chat-message';
-            messageElement.textContent = `: ${message}`;
-
-            // Ajouter les éléments au message principal
-            msgElement.appendChild(badgeElement);
-            msgElement.appendChild(usernameElement);
-            msgElement.appendChild(messageElement);
-
-            // Ajouter le message à la boîte de chat
-            chatBox.appendChild(msgElement);
-
-            // Scroll automatique vers le bas
-            chatBox.scrollTop = chatBox.scrollHeight;
-        });
-
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
