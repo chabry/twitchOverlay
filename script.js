@@ -15,6 +15,22 @@ client.connect().then(() => {
     console.error('Erreur de connexion :', err);
 });
 
+function toPastelColor(hexColor) {
+    // Convertir la couleur hexadécimale en RGB
+    const bigint = parseInt(hexColor.slice(1), 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
+
+    // Mélanger avec du blanc (valeur RGB : 255, 255, 255)
+    r = Math.round((r + 255) / 2);
+    g = Math.round((g + 255) / 2);
+    b = Math.round((b + 255) / 2);
+
+    // Retourner au format hexadécimal
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
 function getBadgeUrls(badges) {
     const badgeUrls = [];
     if (badges) {
@@ -39,6 +55,9 @@ function getBadgeUrls(badges) {
 function addMessage(username, color, badgeUrls, message) {
     const chatBox = document.getElementById('chat-box');
 
+    // Convertir la couleur en pastel
+    const pastelColor = toPastelColor(color || '#FFFFFF');
+
     // Boîte principale du message
     const messageBox = document.createElement('div');
     messageBox.className = 'message-box';
@@ -56,8 +75,8 @@ function addMessage(username, color, badgeUrls, message) {
         const badgeImg = document.createElement('img');
         badgeImg.src = badgeUrl;
         badgeImg.alt = 'Badge';
-        badgeImg.style.width = '20px';
-        badgeImg.style.height = '20px';
+        badgeImg.style.width = '24px';
+        badgeImg.style.height = '24px';
         badgeImg.style.objectFit = 'contain';
 
         // Ajouter un espacement sauf pour le dernier badge
@@ -71,7 +90,7 @@ function addMessage(username, color, badgeUrls, message) {
     // Ajouter le pseudo
     const usernameElement = document.createElement('span');
     usernameElement.className = 'username';
-    usernameElement.style.color = color || '#FFFFFF'; // Couleur par défaut blanche
+    usernameElement.style.color = pastelColor; // Couleur par défaut blanche
     usernameElement.textContent = username;
 
     // Ajouter le contenu du message
